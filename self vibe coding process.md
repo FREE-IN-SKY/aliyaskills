@@ -1,3 +1,42 @@
+**Taking the Codex tool and Claude Code tool (paired with the GLM5.2 model) as examples, the development workflow is as follows:**
+
+**Step 1: First assess the complexity of the requirement**
+
+**I. For lightweight requirements (using the Codex tool)**
+
+1. Invoke the `/read-code-propose-change` Codex skill and provide a concrete requirement description, letting the skill propose a change plan. This skill suits lightweight-requirement scenarios.
+2. If the plan does not cover what you actually want, keep supplementing the requirement description. Many people have not thought their own requirement through; this skill helps clarify it through conversation.
+3. Once the requirement is clear and the plan is out, invoke the `/receiving-code-review-custom` Codex skill to review the plan from the previous step and confirm whether it truly satisfies the requirement. This skill applies not only to reviewing plans but also to debugging code, fixing syntax errors, and similar scenarios.
+4. After the review, the `/receiving-code-review-custom` skill gives a conclusion: whether the plan can be executed directly, or what content still needs to be supplemented. Once supplemented, proceed to the execution phase.
+5. In the execution phase you can invoke the `/test-driven-development` Codex skill (i.e. the test-driven development skill), or directly state what to change and let the AI decide which skill to invoke for execution.
+
+**II. For heavyweight requirements**
+
+**Codex tool part:**
+
+1. Invoke the `/using-superpowers` Codex skill to start the overall Superpowers workflow.
+2. Invoke the `/brainstorming-custom` Codex skill and provide a concrete requirement description to discuss the requirement with the AI. After the discussion, this skill writes a spec document (i.e. a requirements specification document).
+3. After the spec document passes review, invoke the `/writing-plans-custom` Codex skill to write the concrete implementation plan document. This step does not need to be invoked manually on its own — the `/brainstorming-custom` skill's flow already includes the step of calling `/writing-plans-custom`.
+
+**Claude Code tool (paired with the GLM5.2 model) part:**
+
+1. You can switch to a cheaper domestic AI model and invoke the `/subagent-driven-development` Claude Code skill to execute the concrete development task according to the implementation plan document generated in the previous step.
+
+**Step 2: Acceptance workflow after development is complete**
+
+**Codex tool part:**
+
+1. First do manual testing. If problems are found, describe the specific problem directly in the editing page and let the AI fix it, until all manual tests pass.
+2. After testing passes, open a new conversation window and invoke the `/requesting-code-review` Codex skill to review whether the completed code matches the original implementation plan document. This step almost always surfaces some problems.
+3. Invoke the `/receiving-code-review-custom` Codex skill to judge whether the problems surfaced in the previous step actually exist and need to be handled.
+4. Modify according to the judgment result.
+5. One or two rounds of this review-plus-fix loop is enough; do not repeat it endlessly to avoid excessive rework.
+6. Open another new conversation window and invoke the `/simplify-custom` Codex skill to do a scan check on code quality and related aspects.
+7. Invoke the `/receiving-code-review-custom` Codex skill to judge whether the problems scanned by `/simplify-custom` actually exist.
+8. Modify according to the judgment result. After modification, manually ask whether to invoke `/simplify-custom` again for a second scan, and decide whether to continue based on the AI's opinion.
+
+---
+
 **以 Codex 工具与 Claude Code 工具（搭配 GLM5.2 模型）为例，说明开发流程：**
 
 **第一步：先评估需求的复杂程度**
