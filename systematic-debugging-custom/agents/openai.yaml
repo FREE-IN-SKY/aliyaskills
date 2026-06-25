@@ -1,0 +1,3 @@
+interface:
+  display_name: "systematic-debugging-custom"
+  short_description: "Find root causes before attempting fixes"

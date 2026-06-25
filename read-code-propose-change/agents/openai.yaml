@@ -1,0 +1,4 @@
+interface:
+  display_name: "Read Code Propose Change"
+  short_description: "只读代码现状并给出清晰改法"
+  default_prompt: "Use $read-code-propose-change to inspect current code for this requirement and tell me how to change it without editing files."
