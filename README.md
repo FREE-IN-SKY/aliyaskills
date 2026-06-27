@@ -13,7 +13,7 @@ The rules come in Chinese and English versions with identical content; only the 
 - `CLAUDE_ZH.md` / `AGENTS_ZH.md` — Chinese version, for Claude Code / Codex respectively
 - `CLAUDE_EN.md` / `AGENTS_EN.md` — English version, for Claude Code / Codex respectively
 
-Claude Code auto-scans a file named `CLAUDE*.md` in the project root; Codex auto-scans `AGENTS*.md`. Pick the tool you use, then pick the language version, and copy the corresponding file into the project root (renaming it to `CLAUDE.md` / `AGENTS.md` as needed). Rule highlights: answers terse, first response triggers `caveman -- ultra`, no modifying Git history or remotes, describe project state from the perspective of UI operations.
+Claude Code auto-scans a file named `CLAUDE*.md` in the project root; Codex auto-scans `AGENTS*.md`. Pick the tool you use, then pick the language version, and copy the corresponding file into the project root (renaming it to `CLAUDE.md` / `AGENTS.md` as needed). Rule highlights: first response triggers `caveman — ultra`, all answers in English, subagent tools allowed. A Codex hook (`hooks/block-git-write.sh`, wired via `hooks.json`) blocks any git command that mutates history or remotes, keeping commit/push under human control.
 
 ### 2. Skill library
 
@@ -70,7 +70,7 @@ The full workflow is in [self vibe coding process.md](self%20vibe%20coding%20pro
 - `CLAUDE_ZH.md` / `AGENTS_ZH.md` — 中文版，分别对应 Claude Code / Codex
 - `CLAUDE_EN.md` / `AGENTS_EN.md` — 英文版，分别对应 Claude Code / Codex
 
-Claude Code 会自动扫描项目根目录下 `CLAUDE*.md` 命名的文件，Codex 则扫描 `AGENTS*.md`。按使用的工具选定后，再选语言版本，把对应文件复制进项目根目录（按需重命名为 `CLAUDE.md` / `AGENTS.md`）即可。规则要点：回答言简意赅、首次响应先触发 `caveman -- ultra`、禁止修改 Git 历史与远端、描述项目情况以界面操作角度说明。
+Claude Code 会自动扫描项目根目录下 `CLAUDE*.md` 命名的文件，Codex 则扫描 `AGENTS*.md`。按使用的工具选定后，再选语言版本，把对应文件复制进项目根目录（按需重命名为 `CLAUDE.md` / `AGENTS.md`）即可。规则要点：首次响应先触发 `caveman -- ultra`、所有回答基于中文、允许 subagent 工具调用。Codex 钩子（`hooks/block-git-write.sh`，经 `hooks.json` 接入）会拦截所有修改 Git 历史或远端的命令，提交/推送仍由人工掌控。
 
 ### 2. 技能库
 

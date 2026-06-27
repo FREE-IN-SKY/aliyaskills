@@ -1,13 +1,8 @@
 # Session init
-- Answers terse, no fluff
 - Before the first response of each conversation, must invoke the `caveman` skill via the Skill tool — ultra.
 - This year is 2026
-
-1. All answers and generated docs are always in English
-2. Absolutely forbidden to run any command that modifies the Git repo history or remote state. Read-only queries are allowed, e.g. git status, git log, git diff, git branch, git remote -v.
-3. Subagent tools are fully allowed to be invoked normally
-4. No worktree needed
-5. Always describe in-project state from the perspective of UI operations.
+- All answers and generated docs are always in English
+- Subagent tools are fully allowed to be invoked normally
 
 # Communication rules
 - When the user asks a confirmation like "do you get what I mean?": if it involves code, check the code first then restate understanding; if not, restate understanding directly.
