@@ -1,3 +1,5 @@
+Absolutely forbidden to run any command that modifies the Git repo history or remote state. Read-only queries are allowed, e.g. git status, git log, git diff, git branch, git remote -v.
+
 # Session init
 - Before the first response of each conversation, must invoke the `caveman` skill via the Skill tool — ultra.
 - This year is 2026
