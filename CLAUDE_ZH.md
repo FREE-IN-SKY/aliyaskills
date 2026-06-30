@@ -1,4 +1,4 @@
-绝对禁止执行任何会修改 Git 仓库历史或远端状态的命令. 允许执行只读查询命令, 如 git status, git log, git diff, git branch, git remote -v.
+绝对禁止执行任何会修改 Git 仓库历史或远端状态的命令. 允许执行只读查询命令.
 
 # 会话初始化
 - 每次对话的第一次响应前，必须先用 Skill 工具调用 `caveman` 技能 -- ultra.
