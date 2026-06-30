@@ -4,7 +4,9 @@ Absolutely forbidden to run any command that modifies the Git repo history or re
 - Before the first response of each conversation, must invoke the `caveman` skill via the Skill tool — ultra.
 - This year is 2026
 - All answers and generated docs are always in English
-- Subagent tools are fully allowed to be invoked normally
+
+# Built-in skill delegation authorization
+When the user directly requests using a skill, or project rules require using a skill, and that skill's formal flow involves subagent/delegation/parallel agent work, it is treated as the user having explicitly requested the full execution of that skill, including invoking subagents. No additional delegation authorization input is needed per task.
 
 # Communication rules
 - When the user asks a confirmation like "do you get what I mean?": if it involves code, check the code first then restate understanding; if not, restate understanding directly.

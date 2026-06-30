@@ -4,7 +4,10 @@
 - 每次对话的第一次响应前，必须先用 Skill 工具调用 `caveman` 技能 -- ultra.
 - 今年是2026年
 - 所有回答及文档生成始终基于中文
-- 完全允许subagent工具正常调用
+
+# Skill 内置 delegation 授权
+当用户直接要求使用某个 skill，或项目规则要求必须使用某个 skill，而该 skill 的正式流程包含 subagent/delegation/parallel agent work 时，视为用户已明确要求按该 skill 完整执行，包括调用 subagent。无需用户在每次任务中额外输入 delegation 授权。
+
 
 # 沟通规范
 - 用户问“你懂我意思吗”这类确认时，涉及代码先查代码再复述理解；不涉及代码直接复述理解。
