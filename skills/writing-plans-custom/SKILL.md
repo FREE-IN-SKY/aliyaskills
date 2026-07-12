@@ -1,6 +1,6 @@
 ---
 name: writing-plans-custom
-description: Use when the user provides a written specification or acceptance criteria for a multi-file implementation and asks for an implementation plan before coding. Do not use for small fixes, exploratory discussion, code review, debugging, or tasks without explicit requirements.
+description: 当用户提供书面规格或验收标准，并要求在编码前为涉及多个文件的实现编写实施计划时使用。不用于小型修复、探索性讨论、代码审查、故障排查或缺少明确需求的任务。
 ---
 
 # Writing Plans

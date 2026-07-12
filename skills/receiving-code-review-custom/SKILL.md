@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review-custom
-description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor, verification, and user confirmation before code changes
+description: 当用户提供代码审查反馈并希望在实施前评估这些建议时使用，尤其适合反馈含糊或技术上存疑的情况。严谨验证建议，并在修改代码前取得用户确认。
 ---
 
 # Code Review Reception

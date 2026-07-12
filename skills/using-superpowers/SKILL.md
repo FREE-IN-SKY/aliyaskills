@@ -1,6 +1,6 @@
 ---
 name: using-superpowers
-description: Use only when the user explicitly invokes this skill to review available skills or decide which skill should handle a task. Do not invoke automatically.
+description: 仅当用户明确调用此技能，希望查看可用技能或判断某项任务应由哪个技能处理时使用；不要自动触发。
 ---
 
 <SUBAGENT-STOP>
@@ -8,11 +8,9 @@ If you were dispatched as a subagent to execute a specific task, skip this skill
 </SUBAGENT-STOP>
 
 <EXTREMELY-IMPORTANT>
-If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+Use this skill only when the user explicitly invokes it to review available skills or decide which skill should handle a task.
 
-IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
-
-This is not negotiable. This is not optional. You cannot rationalize your way out of this.
+Do not invoke this skill automatically at conversation start, before ordinary responses, or merely because another skill might apply.
 </EXTREMELY-IMPORTANT>
 
 ## Instruction Priority
@@ -47,56 +45,35 @@ Skills speak in actions ("dispatch a subagent", "create a todo", "read a file") 
 
 ## The Rule
 
-**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.
+After the user explicitly invokes this skill, inspect the available skills and recommend the smallest set that covers the task. Explain why each selected skill applies and respect any user instruction that disables or limits a workflow.
+
+Do not turn this skill into a permanent dispatcher. Its guidance applies only to the current explicit skill-selection request.
 
 ```dot
 digraph skill_flow {
-    "User message received" [shape=doublecircle];
-    "About to enter plan mode?" [shape=doublecircle];
-    "Already brainstormed?" [shape=diamond];
-    "Invoke brainstorming skill" [shape=box];
-    "Might any skill apply?" [shape=diamond];
-    "Invoke the skill" [shape=box];
-    "Announce: 'Using [skill] to [purpose]'" [shape=box];
-    "Has checklist?" [shape=diamond];
-    "Create a todo per item" [shape=box];
-    "Follow skill exactly" [shape=box];
-    "Respond (including clarifications)" [shape=doublecircle];
+    "User explicitly invokes this skill" [shape=doublecircle];
+    "Review available skills" [shape=box];
+    "Select smallest applicable set" [shape=box];
+    "Explain selection and boundaries" [shape=box];
+    "Use selected skills" [shape=doublecircle];
 
-    "About to enter plan mode?" -> "Already brainstormed?";
-    "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
-    "Already brainstormed?" -> "Might any skill apply?" [label="yes"];
-    "Invoke brainstorming skill" -> "Might any skill apply?";
-
-    "User message received" -> "Might any skill apply?";
-    "Might any skill apply?" -> "Invoke the skill" [label="yes, even 1%"];
-    "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
-    "Invoke the skill" -> "Announce: 'Using [skill] to [purpose]'";
-    "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
-    "Has checklist?" -> "Create a todo per item" [label="yes"];
-    "Has checklist?" -> "Follow skill exactly" [label="no"];
-    "Create a todo per item" -> "Follow skill exactly";
+    "User explicitly invokes this skill" -> "Review available skills";
+    "Review available skills" -> "Select smallest applicable set";
+    "Select smallest applicable set" -> "Explain selection and boundaries";
+    "Explain selection and boundaries" -> "Use selected skills";
 }
 ```
 
 ## Red Flags
 
-These thoughts mean STOP—you're rationalizing:
+These behaviors mean STOP—the skill is being applied outside its intended scope:
 
 | Thought | Reality |
 |---------|---------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
-| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
-| "Let me gather information first" | Skills tell you HOW to gather information. |
-| "This doesn't need a formal skill" | If a skill exists, use it. |
-| "I remember this skill" | Skills evolve. Read current version. |
-| "This doesn't count as a task" | Action = task. Check for skills. |
-| "The skill is overkill" | Simple things become complex. Use it. |
-| "I'll just do this one thing first" | Check BEFORE doing anything. |
-| "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
-| "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
+| "A new conversation started, so invoke using-superpowers" | New conversations do not trigger this skill. |
+| "Another skill might apply, so invoke using-superpowers first" | Evaluate ordinary skill triggers directly; do not route through this skill. |
+| "Keep using this dispatcher for later turns" | Its scope ends with the user's explicit skill-selection request. |
+| "Select every potentially relevant skill" | Choose the smallest set that fully covers the task. |
 
 ## Skill Priority
 
@@ -105,8 +82,7 @@ When multiple skills could apply, use this order:
 1. **Process skills first** (brainstorming, systematic-debugging) - these determine HOW to approach the task
 2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
 
-"Let's build X" → brainstorming first, then implementation skills.
-"Fix this bug" → systematic-debugging first, then domain-specific skills.
+Apply this ordering only while answering the user's explicit request to select skills. It does not make `using-superpowers` itself automatic.
 
 ## Skill Types
 

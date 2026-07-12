@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when the user explicitly asks for an implementation plan before coding a non-trivial feature or bug fix. Do not use for small localized changes, documentation, formatting, investigation, or tasks where implementation can proceed directly.
+description: 实现新功能、修复缺陷、重构代码或修改既有行为时使用，强制先编写并运行失败测试，再编写最小实现使测试通过。临时原型、生成代码或纯配置文件修改只有在获得用户同意后才能跳过；凡将编写生产代码，必须在动手前先触发此技能。
 ---
 
 # Test-Driven Development (TDD)

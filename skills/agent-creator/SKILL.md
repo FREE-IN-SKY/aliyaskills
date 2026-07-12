@@ -1,6 +1,6 @@
 ---
 name: agent-creator
-description: A knowledge pack for designing and creating Claude Code agent files. Use this skill when the user wants to create a new agent, doesn't know what to put in an agent file, or wants to evaluate whether an existing agent is well-written. Even if the user simply says "help me write an agent", this skill should be triggered.
+description: 用于设计、创建或评估 Claude Code agent 文件。当用户希望新建 agent、不清楚 agent 文件应包含什么，或想检查现有 agent 是否编写合理时使用；即使用户只说“帮我写一个 agent”，也应触发。
 ---
 
 # Agent Creator

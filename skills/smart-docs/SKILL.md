@@ -1,6 +1,6 @@
 ---
 name: smart-docs
-description: "AI-powered comprehensive codebase documentation generator. Analyzes project structure, identifies architecture patterns, creates C4 model diagrams, and generates professional technical documentation. Use when users need to document codebases, understand software architecture, create technical specs, or generate developer guides. Supports all programming languages. Alternative to Litho/deepwiki-rs that uses Claude Code subscription without external API costs."
+description: "当用户希望生成或大幅更新完整的代码库文档时使用，包括架构概览、C4 模型图、技术参考或开发者指南。该技能产出文档制品，而非交互式项目学习；不用于实现功能、排查缺陷或通过对话逐步探索项目。支持所有编程语言。"
 allowed-tools:
   - "Read"
   - "Glob"

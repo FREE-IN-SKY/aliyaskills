@@ -1,6 +1,6 @@
 ---
 name: karpathy-guidelines
-description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.
+description: 分析需求、制定方案、编写或审查代码、重构及修复缺陷时使用的通用工程准则，强调看清结构、守住原则、说透假设与取舍、优先采用最小现有方案、实施外科式改动、修复根因、堵住同类边界问题、编写具体易懂的注释、合并重复逻辑，并留下最小可运行自检。凡任务将生成或修改代码，必须在动手前先触发此技能。
 license: MIT
 ---
 

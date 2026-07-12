@@ -1,6 +1,6 @@
 ---
 name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session
+description: 当用户明确要求在当前会话中通过子代理执行一份已有实施计划，并且计划包含多个可独立实现和审查的任务时使用。不用于编写计划、单个局部任务或存在强顺序依赖的工作。
 ---
 
 # Subagent-Driven Development

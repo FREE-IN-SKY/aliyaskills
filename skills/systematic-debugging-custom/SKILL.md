@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging-custom
-description: Use when the user explicitly asks for root-cause analysis of a reproducible bug, failing test, failed build, confirmed performance regression, or unexpected runtime behavior. Investigate and report evidence, likely root cause, and verification steps only. Do not modify code, configuration, dependencies, or files.
+description: 当用户明确要求对可复现缺陷、测试失败、构建失败、已确认的性能回退或异常运行行为进行根因分析时使用。只调查并报告证据、可能根因和验证步骤，不修改代码、配置、依赖或其他文件。
 ---
 
 # Systematic Debugging

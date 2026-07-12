@@ -1,6 +1,6 @@
 ---
 name: code-reader
-description: Use when you want to deeply understand an unfamiliar codebase and generate reusable cognitive skills from it, by providing a local path or GitHub URL
+description: 当用户提供本地路径或 GitHub URL，希望深入分析陌生代码库，并将经过验证的架构与模块知识生成可复用认知技能文件时使用。不用于对话式项目学习、一次性代码分析、仅生成文档或实施代码修改。
 ---
 
 # Deep Code Reader

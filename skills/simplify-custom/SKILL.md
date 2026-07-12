@@ -1,6 +1,6 @@
 ---
 name: simplify-custom
-description: Review changed code for reuse, quality, and efficiency, report findings, then fix after user confirmation.
+description: 当用户希望检查最近改动的代码是否存在不必要的复杂度、重复、质量或效率问题时使用。先报告发现，获得用户确认后再修复；不用于一般代码审查、正确性故障排查或未明确要求处理的旧代码。
 ---
 
 # Simplify Skill
