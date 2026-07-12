@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging-custom
-description: Use when encountering any bug, test failure, build failure, performance issue, or unexpected behavior to investigate and report the root cause only; do not automatically modify code
+description: Use when the user explicitly asks for root-cause analysis of a reproducible bug, failing test, failed build, confirmed performance regression, or unexpected runtime behavior. Investigate and report evidence, likely root cause, and verification steps only. Do not modify code, configuration, dependencies, or files.
 ---
 
 # Systematic Debugging

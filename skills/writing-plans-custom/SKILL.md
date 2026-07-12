@@ -1,6 +1,6 @@
 ---
 name: writing-plans-custom
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+description: Use when the user provides a written specification or acceptance criteria for a multi-file implementation and asks for an implementation plan before coding. Do not use for small fixes, exploratory discussion, code review, debugging, or tasks without explicit requirements.
 ---
 
 # Writing Plans

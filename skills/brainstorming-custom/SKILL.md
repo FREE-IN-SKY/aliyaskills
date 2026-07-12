@@ -1,6 +1,6 @@
 ---
 name: brainstorming-custom
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: Use when the user asks to design a new feature or make a substantial behavior change and the requirements or design choices are unclear. Explore intent, constraints, acceptance criteria, and implementation options before coding. Do not use for small fixes, routine maintenance, or tasks with complete requirements.
 ---
 
 # Brainstorming Ideas Into Designs
