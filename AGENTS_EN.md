@@ -35,6 +35,6 @@
 - When content has multiple items of the same kind, each with 2+ comparable attributes, use a table, not nested lists.
 
 ## Misc
-- When the user says "just make the change" / "do it directly": don't invoke any editing skill — just edit the target content directly.
+- When a user says "modify directly", only karpathy-guidelines are invoked, without calling any other modification skills, and the target content is modified directly.
 - Never reuse an old subagent.
 - An agent may proactively invoke subagents whenever it judges necessary — whether the task is suited to parallel splitting, or a skill's standard flow itself involves subagent work — without needing the user's explicit authorization each time.
