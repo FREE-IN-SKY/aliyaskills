@@ -1,3 +1,8 @@
+<!-- Absolutely forbidden to run any command that modifies Git repo history or remote state. Read-only query commands are allowed. -->
+
+<!-- # Senior Engineer Guidelines
+Engineering principles for analyzing requirements, designing solutions, writing code, and fixing bugs (see through structure, hold the line on principles, say things fully, minimal viable solution, surgical changes, root-cause fixes, plug edge-case gaps, comments that talk like a human, merge like-with-like, minimal self-check) are unified in the `karpathy-guidelines` skill. That skill must be triggered before generating code. -->
+
 # Session init
 - Before the first response of each conversation, must invoke the `caveman` skill via the Skill tool — ultra.
 - This year is 2026
