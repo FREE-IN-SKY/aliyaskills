@@ -28,7 +28,6 @@ Skills fall into two categories:
 | `brainstorming-custom` | discuss requirement, produce spec |
 | `writing-plans-custom` | write implementation plan from spec |
 | `receiving-code-review-custom` | judge whether review comments are valid |
-| `simplify-custom` | code-quality scan |
 | `systematic-debugging-custom` | systematic troubleshooting |
 | `caveman` | compressed output style |
 | `karpathy-guidelines` | senior-engineer engineering principles |
@@ -51,7 +50,7 @@ The full workflow is in [self vibe coding process.md](self%20vibe%20coding%20pro
 
 - **Lightweight requirement**: `read-code-propose-change` proposes plan → `receiving-code-review-custom` reviews plan → execute once satisfied (optionally with `test-driven-development`).
 - **Heavyweight requirement**: codex side `using-superpowers` → `brainstorming-custom` discusses requirement and produces spec → `writing-plans-custom` writes plan → claude code side uses a cheaper model with `subagent-driven-development` to execute the plan.
-- **After development**: manual test → `requesting-code-review` reviews against plan → `receiving-code-review-custom` judges whether problems are real → fix → `simplify-custom` scans quality → `receiving-code-review-custom` re-checks → fix. One or two rounds is enough; do not over-iterate.
+- **After development**: manual test → `requesting-code-review` reviews against plan → `receiving-code-review-custom` judges whether problems are real → fix → `receiving-code-review-custom` re-checks → fix. One or two rounds is enough; do not over-iterate.
 
 ---
 
@@ -85,7 +84,6 @@ Claude Code 会自动扫描项目根目录下 `CLAUDE*.md` 命名的文件，Cod
 | `brainstorming-custom` | 聊需求、产出 spec |
 | `writing-plans-custom` | 基于 spec 写实施计划 |
 | `receiving-code-review-custom` | 判断审核意见是否属实 |
-| `simplify-custom` | 代码质量扫描 |
 | `systematic-debugging-custom` | 系统化排障 |
 | `caveman` | 压缩输出风格 |
 | `karpathy-guidelines` | 资深工程师工程准则 |
@@ -108,4 +106,4 @@ custom 版本技能基于 superpowers 的流程框架，未安装则部分流程
 
 - **轻量需求**：`read-code-propose-change` 出方案 → `receiving-code-review-custom` 审方案 → 满意后执行（可用 `test-driven-development`）。
 - **重量需求**：codex 端 `using-superpowers` → `brainstorming-custom` 聊需求出 spec → `writing-plans-custom` 写计划 → claude code 端用便宜模型 `subagent-driven-development` 执行计划。
-- **开发完成后**：手动测试 → `requesting-code-review` 对照 plan 审 → `receiving-code-review-custom` 判断问题属实 → 修改 → `simplify-custom` 扫质量 → `receiving-code-review-custom` 复核 → 修改。一两次即可，不过度。
+- **开发完成后**：手动测试 → `requesting-code-review` 对照 plan 审 → `receiving-code-review-custom` 判断问题属实 → 修改 → `receiving-code-review-custom` 复核 → 修改。一两次即可，不过度。
