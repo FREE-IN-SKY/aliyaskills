@@ -10,5 +10,4 @@ Read the skill and answer these questions based SOLELY on what the skill says:
 4. What does the skill say about fixing multiple things at once?
 5. What should you do if you don't fully understand the issue?
 6. Is it ever acceptable to skip the process for simple bugs?
-
 Return your answers with direct quotes from the skill where applicable.

@@ -10,28 +10,28 @@ Help turn ideas into fully formed designs and specs through natural collaborativ
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
 
 <HARD-GATE>
-Once this skill has triggered for a substantial, unclear design task, do not write code, scaffold a project, or take implementation action until you have presented a design and the user has approved it.
+Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
 
-## Scope Boundary
+## Anti-Pattern: "This Is Too Simple To Need A Design"
 
-Use this workflow only for new features or substantial behavior changes whose requirements or design choices are unclear. Do not trigger it for small fixes, routine maintenance, configuration-only changes, or tasks with complete requirements.
+Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
 
 ## Checklist
 
-For tasks within scope, complete these core items in order:
+You MUST create a task for each of these items and complete them in order:
 
 1. **Explore project context** — check files, docs, recent commits
 2. **Offer the visual companion just-in-time** — NOT upfront. The first time a question would genuinely be clearer shown than described, offer it then (its own message); on approval its browser tab opens for you. If no visual question ever arises, never offer it. See the Visual Companion section below.
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Document when needed** — write a design document only when the user asks for one or the task needs a durable implementation handoff
-7. **Transition appropriately** — after approval, follow the user's requested next step; use writing-plans-custom only when a detailed implementation plan is needed
+6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
+7. **Spec review loop** — self-review, dispatch a subagent reviewer, fix blocker issues, and repeat until the reviewer returns **Approved**
+8. **User reviews written spec** — ask user to review the spec file before proceeding
+9. **Transition to implementation** — invoke writing-plans-custom skill to create implementation plan
 
-## Optional Documented-Spec Flow
-
-Use this extended flow only when a written specification and implementation plan are part of the agreed deliverables. Otherwise stop after the conversational design is approved.
+## Process Flow
 
 ```dot
 digraph brainstorming {
@@ -65,7 +65,7 @@ digraph brainstorming {
 }
 ```
 
-The normal terminal state is an approved design. What follows depends on the user's request: discussion may stop, the design may be documented, an implementation plan may be written, or implementation may begin with the appropriate skill.
+**The terminal state is invoking writing-plans-custom.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming-custom is writing-plans-custom.
 
 ## The Process
 
@@ -84,6 +84,7 @@ The normal terminal state is an approved design. What follows depends on the use
 - Propose 2-3 different approaches with trade-offs
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
+- YAGNI ruthlessly - remove unnecessary features from every approach and design
 
 **Presenting the design:**
 
@@ -108,14 +109,12 @@ The normal terminal state is an approved design. What follows depends on the use
 
 ## After the Design
 
-The approved conversational design is sufficient unless the user requests a written specification or the task needs a durable implementation handoff. Apply the documentation and review workflow below only in those cases.
-
 **Documentation:**
 
 - Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
   - (User preferences for spec location override this default)
 - Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document only when the user has requested or authorized a commit
+- Commit the design document to git
 
 **Spec Self-Review:**
 After writing the spec document, look at it with fresh eyes and fix obvious blocker-level issues inline:
@@ -125,7 +124,7 @@ After writing the spec document, look at it with fresh eyes and fix obvious bloc
 3. **Scope check:** Is this focused enough for a single implementation plan, or does it need decomposition?
 4. **Ambiguity check:** Could any requirement be interpreted two different ways? If so, pick one and make it explicit.
 
-If the user requested subagent review, dispatch a reviewer using the prompt template in `spec-document-reviewer-prompt.md`. Otherwise, complete the self-review locally.
+Dispatch a reviewer using the prompt template in `spec-document-reviewer-prompt.md`.
 
 The self-review goal is convergence on **Approved**, not open-ended critique. The reviewer treats the spec as approved by default and returns **Issues Found** only for blockers that would cause the implementation plan to be wrong, incomplete, or scoped incorrectly.
 
@@ -138,28 +137,19 @@ The subagent checks for blocker-level issues:
 
 The reviewer must not block approval for wording, formatting, style preferences, optional detail, or speculative improvements. Put those in **Recommendations** only.
 
-When subagent review was requested and it returns **Issues Found**: fix blocker issues inline, then dispatch another reviewer. On follow-up reviews, verify previous blockers first and raise new blockers only when they were not reasonably visible before the fix. If the same issue repeats, decide whether it is fixed, still blocking, or should be downgraded to a recommendation. Repeat until the reviewer returns **Approved**; without subagent review, proceed after the local self-review passes.
+When the reviewer returns **Issues Found**: fix blocker issues inline, then dispatch another reviewer. On follow-up reviews, verify previous blockers first and raise new blockers only when they were not reasonably visible before the fix. If the same issue repeats, decide whether it is fixed, still blocking, or should be downgraded to a recommendation. Repeat until the reviewer returns **Approved**.
 
 **User Review Gate:**
 After the spec review loop passes, ask the user to review the written spec before proceeding:
 
-> "Spec written to `<path>`. Please review it and let me know if you want any changes or want me to prepare an implementation plan."
+> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
 
 Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
 
 **Implementation:**
 
-- Invoke writing-plans-custom when the user asks for a detailed implementation plan.
-- If the user asks to implement directly after approving the design, use the implementation skill appropriate to the task.
-
-## Key Principles
-
-- **One question at a time** - Don't overwhelm with multiple questions
-- **Multiple choice preferred** - Easier to answer than open-ended when possible
-- **YAGNI ruthlessly** - Remove unnecessary features from all designs
-- **Explore alternatives** - Always propose 2-3 approaches before settling
-- **Incremental validation** - Present design, get approval before moving on
-- **Be flexible** - Go back and clarify when something doesn't make sense
+- Invoke the writing-plans-custom skill to create a detailed implementation plan
+- Do NOT invoke any other skill. writing-plans-custom is the next step.
 
 ## Visual Companion
 

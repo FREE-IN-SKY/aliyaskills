@@ -5,15 +5,14 @@ Use this template when dispatching an implementer subagent.
 ```
 Subagent (general-purpose):
   description: "Implement Task N: [task name]"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
   prompt: |
     You are implementing Task N: [task name]
 
     ## Task Description
 
     Read your task brief first: [BRIEF_FILE]
-    It contains the full task text from the plan.
+    It contains the full task text and the plan's Global Constraints section.
+    Both are binding requirements. Use their exact values verbatim.
 
     ## Context
 
@@ -27,25 +26,42 @@ Subagent (general-purpose):
     - Dependencies or assumptions
     - Anything unclear in the task description
 
-    **Ask them now.** Raise any concerns before starting work.
+    **Ask them now.** Return NEEDS_CONTEXT and end this dispatch. The
+    controller will answer, then create a fresh subagent with that answer.
+    You will not be resumed.
 
     ## Your Job
 
     Once you're clear on requirements:
     1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
+    2. For every production-code change, follow TDD: write and run a failing
+       test before implementation, then make it pass. Pure documentation or
+       configuration-only changes may skip TDD.
     3. Verify implementation works
-    4. Commit your work
-    5. Self-review (see below)
-    6. Report back
+    4. Self-review (see below)
+    5. Report back
 
     Work from: [directory]
 
-    **While you work:** If you encounter something unexpected or unclear, **ask questions**.
-    It's always OK to pause and clarify. Don't guess or make assumptions.
+    **While you work:** If you encounter something unexpected or unclear,
+    return NEEDS_CONTEXT and end this dispatch. Don't guess or make
+    assumptions.
 
-    While iterating, run the focused test for what you're changing; run the
-    full suite once before committing, not after every edit.
+    While iterating, run focused tests that directly cover what you're
+    changing. Do not run the full suite unless the human explicitly requests
+    it. A focused test command may cover more than one test file when the
+    changed behavior crosses those files.
+
+    Git is read-only for this workflow. You may inspect with commands such as
+    `git status`, `git diff`, and `git log`. Do not run commands that mutate
+    Git state, including `git add`, `git commit`, `git amend`, `git rebase`,
+    `git reset`, `git checkout`, `git stash`, or `git worktree`.
+
+    Do not create a nested child agent or delegate your assigned work to
+    another agent. Root-controller delegation remains allowed and required;
+    this rule only forbids subagents from creating further subagents. Perform
+    implementation, fixes, testing, and self-review directly in this dispatch.
+    "Self-review" never means asking another agent to review your work.
 
     ## Code Organization
 
@@ -74,8 +90,8 @@ Subagent (general-purpose):
 
     **How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe
     specifically what you're stuck on, what you've tried, and what kind of help you need.
-    The controller can provide more context, re-dispatch with a more capable model,
-    or break the task into smaller pieces.
+    The controller can provide more context, refine the brief, or break the task
+    into smaller pieces.
 
     ## Before Reporting Back: Self-Review
 
@@ -98,34 +114,40 @@ Subagent (general-purpose):
 
     **Testing:**
     - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD if required?
+    - Did I follow TDD for every production-code change?
     - Are tests comprehensive?
     - Is the test output pristine (no stray warnings or noise)?
 
     If you find issues during self-review, fix them now before reporting.
 
-    ## After Review Findings
+    ## If This Dispatch Is a Review Fix
 
-    If a reviewer finds issues and you fix them, re-run the tests that cover
-    the amended code and append the results to your report file. Reviewers
-    will not re-run tests for you — your report is the test evidence.
+    If this fresh dispatch addresses task-review findings, read the supplied
+    failed review report file and task artifacts, re-run the named tests that
+    cover the amended code, and append the results to the existing task report
+    file. If it addresses final-review findings, write the complete fix and
+    test evidence to the separate final-fix report file supplied by the
+    controller.
+    The reviewer independently re-runs only one smallest safe focused GREEN
+    command. Your report remains the complete test evidence and must name the
+    exact command and relevant output.
 
     ## Report Format
 
     Write your full report to [REPORT_FILE]:
     - What you implemented (or what you attempted, if blocked)
     - What you tested and test results
-    - **TDD Evidence** (if TDD was required for this task):
+    - **TDD Evidence** (required for every production-code change):
       - RED: command run, relevant failing output before implementation, and why the failure was expected
       - GREEN: command run and relevant passing output after implementation
-    - Files changed
+    - Files changed, using repository-relative paths
     - Self-review findings (if any)
     - Any issues or concerns
 
     Then report back with ONLY (under 15 lines — the detail lives in the
     report file):
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - Commits created (short SHA + subject)
+    - Files changed, using repository-relative paths
     - One-line test summary (e.g. "14/14 passing, output pristine")
     - Your concerns, if any
     - The report file path

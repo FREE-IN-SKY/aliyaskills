@@ -10,20 +10,17 @@ more, nothing less) and is well-built (clean, tested, maintainable)
 ```
 Subagent (general-purpose):
   description: "Review Task N (spec + quality)"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
   prompt: |
     You are reviewing one task's implementation: first whether it matches its
     requirements, then whether it is well-built. This is a task-scoped gate,
-    not a merge review — a broad whole-branch review happens separately after
+    not a final review — a broad whole-change review happens separately after
     all tasks are complete.
 
     ## What Was Requested
 
     Read the task brief: [BRIEF_FILE]
-
-    Global constraints from the spec/design that bind this task:
-    [GLOBAL_CONSTRAINTS]
+    It contains the task text and the same Global Constraints section the
+    implementer received. Treat both as binding requirements.
 
     ## What the Implementer Claims They Built
 
@@ -31,17 +28,18 @@ Subagent (general-purpose):
 
     ## Diff Under Review
 
-    **Base:** [BASE_SHA]
-    **Head:** [HEAD_SHA]
     **Diff file:** [DIFF_FILE]
+    **Review report file:** [REVIEW_FILE]
 
-    Read the diff file once — it contains the commit list, a stat summary,
-    and the full diff with surrounding context, and it is your view of the
-    change. The diff's context lines ARE the changed files: do not Read a
+    Read the diff file once — it contains the changed-path list, a stat
+    summary, and the full diff from immediately before this task began to its
+    current state, limited to the task's reported files. It is your view of
+    this task's change, excluding earlier tasks even when they touched the
+    same files. The diff's context lines ARE the changed files: do not Read a
     changed file separately unless a hunk you must judge is cut off
     mid-function — and say so in your report. Do not re-run git commands.
-    If the diff file is missing, fetch the diff yourself:
-    `git diff --stat [BASE_SHA]..[HEAD_SHA]` and `git diff [BASE_SHA]..[HEAD_SHA]`.
+    If the diff file is missing, stop and report that the required review
+    artifact is unavailable. Do not reconstruct it yourself.
     Do not crawl the broader codebase. Inspect code outside the diff only
     to evaluate a concrete risk you can name — one focused check per named
     risk, and name both the risk and what you checked in your report.
@@ -49,8 +47,14 @@ Subagent (general-purpose):
     lock ordering, a function or API contract, or shared mutable state,
     checking the call sites is the right method.
 
-    Your review is read-only on this checkout. Do not mutate the working
-    tree, the index, HEAD, or branch state in any way.
+    Your review is read-only on project files. Your only permitted write is
+    the review report at [REVIEW_FILE]. Do not mutate source files, tests, the
+    index, HEAD, or branch state in any way.
+
+    Do not create a nested child agent or delegate this review to another
+    agent. Root-controller delegation remains allowed and required; this rule
+    only forbids subagents from creating further subagents. Perform this review
+    directly in this dispatch.
 
     ## Do Not Trust the Report
 
@@ -63,17 +67,30 @@ Subagent (general-purpose):
 
     ## Tests
 
-    The implementer already ran the tests and reported results with TDD
-    evidence for exactly this code. Do not re-run the suite to confirm their
-    report. Run a test only when reading the code raises a specific doubt
-    that no existing run answers — and then a focused test, never a
-    package-wide suite, race detector run, or repeated/high-count loop. If
-    heavy validation seems warranted, recommend it in your report instead of
-    running it. If you cannot run commands in this environment, name the
-    test you would run.
+    The implementer already ran tests and reported TDD evidence. For every
+    production-code task, independently re-run exactly one smallest safe
+    focused GREEN test command from the report. Do not re-run RED, a full
+    suite, a package-wide suite, a race detector, or a repeated/high-count
+    loop. If the reported command is unsafe, mutates external state, or cannot
+    be narrowed to a focused test, do not run it; report a ⚠️ item naming the
+    command and reason so the controller can resolve independent verification.
+    Documentation and configuration-only tasks do not require this re-run.
+
+    Run any additional test only when reading the code raises a specific doubt
+    that no existing run answers. If heavy validation seems warranted,
+    recommend it instead of running it. If you cannot run commands in this
+    environment, name the test you would run.
 
     Warnings or other noise in the implementer's reported test output are
     findings — test output should be pristine.
+
+    For every production-code change, verify that the report contains the
+    required TDD evidence: the RED command, relevant expected failure, reason
+    that failure was expected, GREEN command, and relevant passing output.
+    Missing required TDD evidence is an Important finding and makes task
+    quality `Needs fixes`.
+    A failed independent GREEN re-run is an Important finding. A required
+    re-run that cannot be performed is a ⚠️ item for controller resolution.
 
     ## Part 1: Spec Compliance
 
@@ -115,10 +132,13 @@ Subagent (general-purpose):
     "yes." A tight report that cites lines gives the controller everything
     it needs.
 
-    Your final message is the report itself: begin directly with the
-    spec-compliance verdict. Every line is a verdict, a finding with
-    file:line, or a check you ran — no preamble, no process narration,
-    no closing summary.
+    Write the complete report to [REVIEW_FILE] using the output format below.
+    If that file cannot be written, stop and report that the required review
+    artifact could not be created.
+
+    Then return ONLY a short summary under 15 lines: spec-compliance verdict,
+    task-quality verdict, issue counts by severity, unresolved ⚠️ items, and
+    the review report path. No preamble or process narration.
 
     ## Calibration
 
@@ -133,6 +153,9 @@ Subagent (general-purpose):
     block), that IS a finding — report it as Important, labeled
     plan-mandated. The plan's authorship does not grade its own work; the
     human decides.
+    Every spec-compliance failure must be categorized as Critical or Important.
+    Set `Task quality: Needs fixes` only when at least one Critical or Important
+    finding exists. Minor findings alone do not block task completion.
     Acknowledge what was done well before listing issues — accurate praise
     helps the implementer trust the rest of the feedback.
 
@@ -166,23 +189,22 @@ Subagent (general-purpose):
 ```
 
 **Placeholders:**
-- `[MODEL]` — REQUIRED: reviewer model per SKILL.md Model Selection
 - `[BRIEF_FILE]` — REQUIRED: the task brief file (`scripts/task-brief PLAN N`
-  prints the path; same file the implementer worked from)
-- `[GLOBAL_CONSTRAINTS]` — the binding requirements copied verbatim from
-  the plan's Global Constraints section or the spec: exact values, formats,
-  and stated relationships between components (not process rules — those
-  are already in this template)
+  prints the path; it contains the task text and Global Constraints section,
+  and is the same file the implementer worked from)
 - `[REPORT_FILE]` — REQUIRED: the file the implementer wrote its detailed
   report to
-- `[BASE_SHA]` — commit before this task
-- `[HEAD_SHA]` — current commit
 - `[DIFF_FILE]` — REQUIRED: the path the controller wrote the review
-  package to (`scripts/review-package BASE HEAD` prints the unique path it
-  wrote; the package never enters the controller's context)
+  package to (`scripts/review-package --from BASELINE_FILE -- PATH...` prints
+  the unique path it wrote; pass the task-start baseline and the cumulative
+  union of files listed across the implementer and all fixer report entries)
+- `[REVIEW_FILE]` — REQUIRED: a unique output path for this review cycle, such
+  as `task-N-review-1.md`; never overwrite an earlier failed review
 
-**Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues
-(Critical/Important/Minor), Task quality verdict
+**Reviewer writes:** Full Spec Compliance verdict (✅/❌/⚠️), Strengths,
+Issues (Critical/Important/Minor), and Task quality verdict to `[REVIEW_FILE]`
+
+**Reviewer returns:** A short verdict summary and `[REVIEW_FILE]` path
 
 A fix dispatch can address spec gaps and quality findings together;
 re-review after fixes covers both verdicts.

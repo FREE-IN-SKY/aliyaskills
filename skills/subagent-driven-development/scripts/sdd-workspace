@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Resolve and ensure the working-tree directory SDD uses for its short-lived
-# artifacts: task briefs, implementer reports, review packages, and the
-# progress ledger. Print the directory's absolute path.
+# artifacts: task briefs, task baselines, private snapshot objects,
+# implementer reports, review packages, and the progress ledger. Print the
+# directory's absolute path.
 #
 # The workspace lives in the working tree (not under .git/) because Claude Code
 # treats .git/ as a protected path and denies agent writes there — which blocks
@@ -18,5 +19,7 @@ set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 dir="$root/.superpowers/sdd"
 mkdir -p "$dir"
-printf '*\n' > "$dir/.gitignore"
+if [ ! -f "$dir/.gitignore" ]; then
+  printf '*\n' > "$dir/.gitignore"
+fi
 cd "$dir" && pwd
