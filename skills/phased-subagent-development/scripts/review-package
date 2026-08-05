@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# Capture a task-start baseline or generate a review package from two isolated
+# working-tree snapshots. The snapshots use a private index and object store;
+# the repository's real index, HEAD, refs, and object store are never changed.
+#
+# Usage:
+#   review-package --start
+#   review-package --from BASELINE_FILE -- PATH...
+#   review-package --from BASELINE_FILE
+#   review-package
+set -euo pipefail
+
+root=$(git rev-parse --show-toplevel)
+dir=$("$(cd "$(dirname "$0")" && pwd)/sdd-workspace")
+stamp=$(date +%Y%m%dT%H%M%S)
+object_dir="$dir/objects"
+git_object_dir=$(cd "$(git rev-parse --git-path objects)" && pwd)
+mkdir -p "$object_dir"
+
+snapshot_count=0
+snapshot_tree() {
+  snapshot_count=$((snapshot_count + 1))
+  local index_file="$dir/snapshot-index-${stamp}-$$-${snapshot_count}"
+  local tree
+
+  rm -f "$index_file" "$index_file.lock"
+  GIT_INDEX_FILE="$index_file" \
+    GIT_OBJECT_DIRECTORY="$object_dir" \
+    GIT_ALTERNATE_OBJECT_DIRECTORIES="$git_object_dir" \
+    git read-tree HEAD
+  GIT_INDEX_FILE="$index_file" \
+    GIT_OBJECT_DIRECTORY="$object_dir" \
+    GIT_ALTERNATE_OBJECT_DIRECTORIES="$git_object_dir" \
+    git add -A
+  tree=$(GIT_INDEX_FILE="$index_file" \
+    GIT_OBJECT_DIRECTORY="$object_dir" \
+    GIT_ALTERNATE_OBJECT_DIRECTORIES="$git_object_dir" \
+    git write-tree)
+  rm -f "$index_file" "$index_file.lock"
+  printf '%s\n' "$tree"
+}
+
+if [ $# -eq 1 ] && [ "$1" = "--start" ]; then
+  baseline="$dir/task-baseline-${stamp}-$$.tree"
+  snapshot_tree > "$baseline"
+  echo "wrote ${baseline}"
+  exit 0
+fi
+
+baseline_file=
+paths=()
+if [ $# -gt 0 ]; then
+  if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
+    echo "usage: review-package --start | review-package --from BASELINE_FILE [-- PATH...] | review-package" >&2
+    exit 2
+  fi
+  baseline_file=$2
+  shift 2
+  if [ $# -gt 0 ]; then
+    if [ "$1" != "--" ]; then
+      echo "usage: review-package --start | review-package --from BASELINE_FILE [-- PATH...] | review-package" >&2
+      exit 2
+    fi
+    shift
+    paths=("$@")
+    if [ ${#paths[@]} -eq 0 ]; then
+      echo "task review requires at least one reported path" >&2
+      exit 2
+    fi
+  fi
+fi
+
+if [ -n "$baseline_file" ]; then
+  [ -f "$baseline_file" ] || { echo "no such baseline file: $baseline_file" >&2; exit 2; }
+  baseline_tree=$(tr -d '[:space:]' < "$baseline_file")
+  case "$baseline_tree" in
+    ''|*[!0-9a-f]*) echo "invalid baseline tree in $baseline_file" >&2; exit 2 ;;
+  esac
+else
+  baseline_tree=$(git rev-parse 'HEAD^{tree}')
+fi
+
+current_tree=$(snapshot_tree)
+GIT_OBJECT_DIRECTORY="$object_dir" \
+  GIT_ALTERNATE_OBJECT_DIRECTORIES="$git_object_dir" \
+  git cat-file -e "${baseline_tree}^{tree}" || {
+    echo "baseline tree is unavailable: $baseline_tree" >&2
+    exit 2
+  }
+
+cd "$root"
+actual_paths=()
+while IFS= read -r -d '' path; do
+  actual_paths+=("$path")
+done < <(GIT_OBJECT_DIRECTORY="$object_dir" \
+  GIT_ALTERNATE_OBJECT_DIRECTORIES="$git_object_dir" \
+  git diff --no-renames --name-only -z "$baseline_tree" "$current_tree")
+
+if [ ${#paths[@]} -gt 0 ]; then
+  for path in "${paths[@]}"; do
+    [ -n "$path" ] || { echo "reported paths must not be empty" >&2; exit 2; }
+  done
+
+  mismatch=0
+  for path in "${actual_paths[@]}"; do
+    found=0
+    for reported_path in "${paths[@]}"; do
+      if [ "$reported_path" = "$path" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      printf 'changed path missing from implementer report: %q\n' "$path" >&2
+      mismatch=1
+    fi
+  done
+  for path in "${paths[@]}"; do
+    found=0
+    for changed_path in "${actual_paths[@]}"; do
+      if [ "$changed_path" = "$path" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      printf 'reported path has no task delta: %q\n' "$path" >&2
+      mismatch=1
+    fi
+  done
+  [ "$mismatch" -eq 0 ] || exit 2
+  paths=("${actual_paths[@]}")
+fi
+
+out="$dir/review-working-tree-${stamp}-$$.diff"
+pathspec=()
+if [ ${#paths[@]} -gt 0 ]; then
+  pathspec=(-- "${paths[@]}")
+fi
+
+{
+  echo "# Review package: isolated working-tree delta"
+  echo
+  echo "## Scope"
+  if [ ${#paths[@]} -gt 0 ]; then
+    printf '%s\n' "${paths[@]}"
+  elif [ -n "$baseline_file" ]; then
+    echo "all changes since workflow baseline"
+  else
+    echo "all working-tree changes since HEAD"
+  fi
+  echo
+  echo "## Changed paths"
+  GIT_OBJECT_DIRECTORY="$object_dir" \
+    GIT_ALTERNATE_OBJECT_DIRECTORIES="$git_object_dir" \
+    git --literal-pathspecs diff --name-status "$baseline_tree" "$current_tree" "${pathspec[@]}"
+  echo
+  echo "## Summary"
+  GIT_OBJECT_DIRECTORY="$object_dir" \
+    GIT_ALTERNATE_OBJECT_DIRECTORIES="$git_object_dir" \
+    git --literal-pathspecs diff --stat "$baseline_tree" "$current_tree" "${pathspec[@]}"
+  echo
+  echo "## Diff"
+  GIT_OBJECT_DIRECTORY="$object_dir" \
+    GIT_ALTERNATE_OBJECT_DIRECTORIES="$git_object_dir" \
+    git --literal-pathspecs diff -U10 "$baseline_tree" "$current_tree" "${pathspec[@]}"
+} > "$out"
+
+echo "wrote ${out}: $(wc -c < "$out" | tr -d ' ') bytes"
