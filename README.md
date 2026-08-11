@@ -2,55 +2,48 @@
 
 **Philosophy**: Commit power stays with the programmer. Until a requirement is fully done, code stays in the working tree; commits are made by a human, not the agent framework.
 
-A daily-use AI programming skill library. Based on [superpowers](https://github.com/obra/superpowers.git), it contains a set of custom-version workflow skills, plus conversation-rule files meant to be placed in a project's root directory.
+A daily-use AI programming skill library, inspired by [superpowers](https://github.com/obra/superpowers.git), customized for day-to-day comfort. It contains a set of custom-version workflow skills, plus conversation-rule files meant to be placed in a project's root directory.
 
 ## Composition
 
 ### 1. Conversation-rule files (placed in the project root when writing a project)
 
-The rules come in Chinese and English versions with identical content; only the filenames differ, because Claude Code and Codex scan different default filenames.
+The rules come in Chinese and English versions with identical content:
 
-- `CLAUDE_ZH.md` / `AGENTS_ZH.md` — Chinese version, for Claude Code / Codex respectively
-- `CLAUDE_EN.md` / `AGENTS_EN.md` — English version, for Claude Code / Codex respectively
+- `AGENTS_ZH.md` — Chinese version
+- `AGENTS_EN.md` — English version
 
-Claude Code auto-scans a file named `CLAUDE*.md` in the project root; Codex auto-scans `AGENTS*.md`. Pick the tool you use, then pick the language version, and copy the corresponding file into the project root (renaming it to `CLAUDE.md` / `AGENTS.md` as needed). Rule highlights: first response triggers `caveman — ultra`, all answers in English, subagent tools allowed. A Codex hook (`hooks/block-git-write.sh`, wired via `hooks.json`) blocks any git command that mutates history or remotes, keeping commit/push under human control.
+Codex auto-scans a file named `AGENTS*.md` in the project root. Pick the language version and copy it into the project root (renaming it to `AGENTS.md` as needed). Rule highlights: first response triggers `caveman — ultra`, all answers in English, subagent tools allowed. A Codex hook (`hooks/block-git-write.sh`, wired via `hooks.json`) blocks any git command that mutates history or remotes, keeping commit/push under human control.
 
 ### 2. Skill library
 
 Skills fall into two categories:
 
-**Original superpowers skills** — directly from superpowers, the foundation of the workflow framework.
-
-**Custom-version skills** — derived from the superpowers versions, tailored to the actual usage workflow. Prefer the custom version for workflow tools:
+**Custom-version skills** — derived from the superpowers versions, tailored to the actual usage workflow.
 
 | Skill | Purpose |
 |------|------|
-| `brainstorming-custom` | discuss requirement, produce spec |
+| `brainstorming-custom` | discuss requirement, produce spec, manual invocation only |
 | `writing-plans-custom` | write implementation plan from spec |
 | `receiving-code-review-custom` | judge whether review comments are valid |
 | `systematic-debugging-custom` | systematic troubleshooting |
 | `caveman` | compressed output style |
 | `karpathy-guidelines` | senior-engineer engineering principles |
-| `read-code-propose-change` | read code and propose plan for lightweight requirements |
-| others | `agent-creator`, `frontend-design`, `playwright-cli`, `smart-docs`, `theme-factory`, `webapp-testing`, etc. |
-
-## Prerequisites
-
-Before use, install superpowers yourself:
-
-```
-git@github.com:obra/superpowers.git
-```
-
-The custom-version skills build on superpowers' workflow framework; some workflow skills will not work properly without it installed.
+| `code-reader` | read unfamiliar codebase, produce reusable knowledge skill |
+| `dispatching-parallel-agents` | dispatch 2+ independent tasks in parallel |
+| `executing-plans` | execute a plan across sessions with review checkpoints |
+| `phased-subagent-development` | run an existing plan phase-by-phase via subagents |
+| `project-explorer` | interactive, staged project learning |
+| `requesting-code-review` | verify finished work against requirements |
+| `test-driven-development` | write tests before implementation |
+| `verification-before-completion` | verify before claiming work done |
+| others | `agent-creator`, `frontend-design`, `smart-docs`, `webapp-testing`, etc. |
 
 ## Workflow
 
-The full workflow is in [self vibe coding process.md](self%20vibe%20coding%20process.md). Summary:
-
-- **Lightweight requirement**: `read-code-propose-change` proposes plan → `receiving-code-review-custom` reviews plan → execute once satisfied (optionally with `test-driven-development`).
-- **Heavyweight requirement**: codex side `using-superpowers` → `brainstorming-custom` discusses requirement and produces spec → `writing-plans-custom` writes plan → claude code side uses a cheaper model with `subagent-driven-development` to execute the plan.
-- **After development**: manual test → `requesting-code-review` reviews against plan → `receiving-code-review-custom` judges whether problems are real → fix → `receiving-code-review-custom` re-checks → fix. One or two rounds is enough; do not over-iterate.
+- **Lightweight requirement**: chat directly with the AI about the requirement, then let it start work; the AI auto-invokes the matching skill based on each skill's description.
+- **Heavyweight requirement**: manually invoke `brainstorming-custom` to kick off the flow, then follow the prompts the flow itself gives (it chains into `writing-plans-custom`, etc.).
+- **After development**: manual test — file a bug and let the AI fix it if you find one, otherwise it's done.
 
 ---
 
@@ -58,52 +51,45 @@ The full workflow is in [self vibe coding process.md](self%20vibe%20coding%20pro
 
 **理念**：提交代码的权力归程序员。在需求未完全实现之前，代码停留在工作区；提交由人工完成，而非 agent 框架替人提交。
 
-日常使用的 AI 编程技能库。基于 [superpowers](https://github.com/obra/superpowers.git)，包含一套自定义的 custom 版本流程技能，以及放项目根目录用的会话规则文件。
+日常使用的 AI 编程技能库，参考了 [superpowers](https://github.com/obra/superpowers.git)，从日常使用中舒适度进行定制修改, 包含一套自定义的 custom 版本流程技能，以及放项目根目录用的会话规则文件。
 
 ## 组成
 
 ### 1. 会话规则文件（写项目时放项目根目录）
 
-规则分中文版与英文版，内容完全一样，只是文件名不同，因为 Claude Code 与 Codex 默认扫描的文件名不一样。
+规则分中文版与英文版，内容完全一样：
 
-- `CLAUDE_ZH.md` / `AGENTS_ZH.md` — 中文版，分别对应 Claude Code / Codex
-- `CLAUDE_EN.md` / `AGENTS_EN.md` — 英文版，分别对应 Claude Code / Codex
+- `AGENTS_ZH.md` — 中文版
+- `AGENTS_EN.md` — 英文版
 
-Claude Code 会自动扫描项目根目录下 `CLAUDE*.md` 命名的文件，Codex 则扫描 `AGENTS*.md`。按使用的工具选定后，再选语言版本，把对应文件复制进项目根目录（按需重命名为 `CLAUDE.md` / `AGENTS.md`）即可。规则要点：首次响应先触发 `caveman -- ultra`、所有回答基于中文、允许 subagent 工具调用。Codex 钩子（`hooks/block-git-write.sh`，经 `hooks.json` 接入）会拦截所有修改 Git 历史或远端的命令，提交/推送仍由人工掌控。
+Codex 会自动扫描项目根目录下 `AGENTS*.md` 命名的文件。按语言版本选好后，复制进项目根目录（按需重命名为 `AGENTS.md`）即可。规则要点：首次响应先触发 `caveman -- ultra`、所有回答基于中文、允许 subagent 工具调用。Codex 钩子（`hooks/block-git-write.sh`，经 `hooks.json` 接入）会拦截所有修改 Git 历史或远端的命令，提交/推送仍由人工掌控。
 
 ### 2. 技能库
 
 技能分两类：
 
-**superpowers 原版技能** — 直接来自 superpowers，流程框架的基础。
-
-**custom 版本技能** — 脱胎于 superpowers 版本，针对实际使用流程定制。流程工具优先用 custom 版本：
+**custom 版本技能** — 脱胎于 superpowers 版本，针对实际使用流程定制。
 
 | 技能 | 用途 |
 |------|------|
-| `brainstorming-custom` | 聊需求、产出 spec |
+| `brainstorming-custom` | 聊需求、产出 spec, 只有手动调用才会调用 |
 | `writing-plans-custom` | 基于 spec 写实施计划 |
 | `receiving-code-review-custom` | 判断审核意见是否属实 |
 | `systematic-debugging-custom` | 系统化排障 |
 | `caveman` | 压缩输出风格 |
 | `karpathy-guidelines` | 资深工程师工程准则 |
-| `read-code-propose-change` | 轻量需求读码出方案 |
-| 其余 | `agent-creator`、`frontend-design`、`playwright-cli`、`smart-docs`、`theme-factory`、`webapp-testing` 等 |
-
-## 前置安装
-
-使用前需自行安装 superpowers：
-
-```
-git@github.com:obra/superpowers.git
-```
-
-custom 版本技能基于 superpowers 的流程框架，未安装则部分流程技能无法正常工作。
+| `code-reader` | 读陌生代码库，产出可复用认知技能 |
+| `dispatching-parallel-agents` | 派发 2+ 个独立任务并行执行 |
+| `executing-plans` | 跨会话执行计划，带审查点 |
+| `phased-subagent-development` | 用子代理分阶段执行已有计划 |
+| `project-explorer` | 交互式分阶段了解项目 |
+| `requesting-code-review` | 完成后对照需求验收审查 |
+| `test-driven-development` | 先写测试再实现 |
+| `verification-before-completion` | 声明完成前先验证 |
+| 其余 | `agent-creator`、`frontend-design`、`smart-docs`、`webapp-testing` 等 |
 
 ## 使用流程
 
-完整流程见 [self vibe coding process.md](self%20vibe%20coding%20process.md)。摘要：
-
-- **轻量需求**：`read-code-propose-change` 出方案 → `receiving-code-review-custom` 审方案 → 满意后执行（可用 `test-driven-development`）。
-- **重量需求**：codex 端 `using-superpowers` → `brainstorming-custom` 聊需求出 spec → `writing-plans-custom` 写计划 → claude code 端用便宜模型 `subagent-driven-development` 执行计划。
-- **开发完成后**：手动测试 → `requesting-code-review` 对照 plan 审 → `receiving-code-review-custom` 判断问题属实 → 修改 → `receiving-code-review-custom` 复核 → 修改。一两次即可，不过度。
+- **轻量需求**：直接跟 AI 聊需求，聊完让 AI 直接开始做，AI 会根据各技能的 description 自动判断该调用哪个。
+- **重量需求**：手动调用 `brainstorming-custom` 启动流程，之后按该流程本身给出的提示往下走（会自动衔接到 `writing-plans-custom` 等步骤）。
+- **开发完成后**：手动测试，有 bug 就提 bug 让 AI 修，没有 bug 就算过。
