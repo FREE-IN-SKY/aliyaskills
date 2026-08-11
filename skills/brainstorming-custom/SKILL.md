@@ -1,6 +1,6 @@
 ---
 name: brainstorming-custom
-description: 当用户希望设计新功能或进行重大行为变更，但需求或设计选择尚不清晰时使用。在编码前共同梳理意图、约束、验收标准和实现选项；不用于小修复、日常维护或需求已经完整的任务。
+description: 仅当用户明确手动调用 brainstorming-custom 技能时使用, 禁止根据任务内容自动调用. 用于在编码前共同梳理新功能或重大行为变更的意图, 约束, 验收标准和实现选项.
 ---
 
 # Brainstorming Ideas Into Designs
