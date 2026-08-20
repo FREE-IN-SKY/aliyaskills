@@ -110,6 +110,8 @@ For multi-step work, use:
 
 Loop until the success criteria pass.
 
+Keep local verification focused on the files and packages changed. Run the smallest relevant test set; do not run the full workspace test suite as a routine completion step.
+
 ## 7. Check Edge Cases Before Finalizing
 
 Before calling a plan complete, check edge cases that are reachable under the current contract, explicitly requested, observed in real data, or located at a trust boundary:
