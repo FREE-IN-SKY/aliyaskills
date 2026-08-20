@@ -21,6 +21,18 @@ Before writing code:
 
 For complex requests, first ask: "Do we really need X, or is Y enough?"
 
+## Scope and Evidence Gate
+
+The user's requested observable behavior defines the scope.
+
+Only complexity required by the current request, a verified reachable execution path, a reproduced failure, or an explicit data contract is allowed.
+
+Existing project patterns may guide implementation of an already-justified change, but cannot independently justify new complexity.
+
+Do not design abstractions, configuration, compatibility, fallbacks, extension points, or generalized solutions for hypothetical future requirements.
+
+If correctness requires expanding the requested scope, state the concrete evidence before doing so.
+
 ## 2. Think Like a Senior Engineer
 
 Before designing a solution, identify the objects involved and how the objects relate.
@@ -31,15 +43,15 @@ Before implementation, give each module one responsibility sentence:
 
 > This module only does X.
 
-If the responsibility sentence contains "and" or "and/also", split the module.
+Treat "and" in a responsibility sentence as a signal to inspect, not an automatic reason to split.
 
-Do not split a module if the split only adds interfaces, classes, files, or naming without changing responsibility boundaries. Split to separate real responsibilities or to collapse duplicated entry points; do not split just to add names.
+Split only when the responsibilities have independent callers, change for different reasons, or already cause duplicated logic or mixed ownership.
 
-For every technical choice, add:
+Do not split when doing so only adds files, interfaces, forwarding code, or coordination between pieces that still change together.
 
-> Did not choose X because Y.
+Explain rejected alternatives only when multiple reasonable choices exist and the choice materially affects behavior, scope, risk, or maintainability.
 
-This explanation can be omitted only when there is exactly one reasonable choice.
+Do not enumerate hypothetical alternatives for routine or obvious decisions.
 
 ## 3. Use the Smallest Existing Solution
 
@@ -77,10 +89,10 @@ For bug reports:
 
 1. Treat the report as a symptom.
 2. Find the function that owns the broken behavior.
-3. Search every caller of that function.
-4. Fix the shared entry point once when possible.
+3. Inspect enough callers to confirm the ownership and affected execution path.
+4. Fix a shared entry point only when evidence shows that the same root cause affects multiple currently reachable paths.
 
-Do not patch only the reported path if sibling paths can still fail.
+Do not modify sibling paths merely because they look similar. Do not broaden the fix to hypothetical callers or unobserved failures.
 
 ## 6. Define Verifiable Success
 
@@ -100,13 +112,17 @@ Loop until the success criteria pass.
 
 ## 7. Check Edge Cases Before Finalizing
 
-Before calling a plan complete, check:
+Before calling a plan complete, check edge cases that are reachable under the current contract, explicitly requested, observed in real data, or located at a trust boundary:
 
 * Empty input: what happens?
 * Out-of-range input: what happens?
 * Shared mutable data: can multiple readers or writers overwrite each other?
 
 For each case, state one sentence: either the case is already handled and where, or the case will fail and how the plan fixes the failure.
+
+Do not add validation, fallbacks, retries, or recovery branches for states that the established contract makes impossible.
+
+If the contract is unclear, verify it before adding defensive code.
 
 Do not skip input validation at trust boundaries, data-loss prevention, security, accessibility, hardware calibration, or explicitly requested requirements.
 
@@ -134,11 +150,15 @@ Do not keep two functions that perform the same responsibility.
 
 ## 10. Leave a Minimal Self-Check
 
-For non-trivial logic, leave the smallest runnable self-check:
+For changed non-trivial behavior, use the project's existing verification mechanism when it can catch the regression.
+
+Add a new self-check only when it materially protects the requested behavior and requires no new framework, fixture layer, helper abstraction, or production hook.
+
+When a new self-check is justified, keep it minimal:
 
 * no test framework required,
 * no fixtures required,
 * a simple assertion or single-file self-check is enough,
 * the self-check must fail when the logic breaks.
 
-One-line simple implementations do not need a self-check.
+Do not add tests that only verify implementation details, wording, trivial delegation, or one-line simple implementations.
