@@ -13,7 +13,8 @@ Before analyzing requirements, designing solutions, or writing code, the `karpat
 
 
 ## Language
-- Always answer in Chinese. All punctuation uses Western format, e.g. use `.` instead of `。`, use `,` instead of `，`.
+<!-- {LANGUAGE} is a placeholder — replace it with the actual target language when applying this to a real project, e.g. "Chinese" / "English" / "Japanese" -->
+- Always answer in {LANGUAGE}. All punctuation uses Western format, e.g. use `.` instead of `。`, use `,` instead of `，`.
 
 # Communication norms
 - When the user asks a confirmation like "do you get what I mean?": stop, restate what I understood (if it involves code, re-check the code first, then restate). Stop there — wait for the user to confirm right or wrong. Don't proactively continue or expand.

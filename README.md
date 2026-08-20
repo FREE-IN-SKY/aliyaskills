@@ -15,7 +15,7 @@ The rules come in Chinese and English versions with identical content:
 - `AGENTS_ZH.md` — Chinese version
 - `AGENTS_EN.md` — English version
 
-Codex auto-scans a file named `AGENTS*.md` in the project root. Pick the language version and copy it into the project root (renaming it to `AGENTS.md` as needed). Rule highlights: first response triggers `caveman — ultra`, all answers in English, subagent tools allowed. A Codex hook (`hooks/block-git-write.sh`, wired via `hooks.json`) blocks any git command that mutates history or remotes, keeping commit/push under human control.
+These rule files are generic — usable with any AI coding tool. Pick the language version and copy it into the project root, naming it per your tool's convention (e.g. `AGENTS.md` for Codex, `CLAUDE.md` for Claude Code). Rule highlights: first response triggers `caveman — ultra`, answers in `{LANGUAGE}` (replace with target language when applying), subagent tools allowed. A hook (`hooks/block-git-write.sh`, wired via `hooks.json`) blocks any git command that mutates history or remotes, keeping commit/push under human control.
 
 ### 2. Skill library
 
@@ -66,7 +66,7 @@ Skills fall into two categories:
 - `AGENTS_ZH.md` — 中文版
 - `AGENTS_EN.md` — 英文版
 
-Codex 会自动扫描项目根目录下 `AGENTS*.md` 命名的文件。按语言版本选好后，复制进项目根目录（按需重命名为 `AGENTS.md`）即可。规则要点：首次响应先触发 `caveman -- ultra`、所有回答基于中文、允许 subagent 工具调用。Codex 钩子（`hooks/block-git-write.sh`，经 `hooks.json` 接入）会拦截所有修改 Git 历史或远端的命令，提交/推送仍由人工掌控。
+这两份规则文件内容通用, 哪个 AI 编程工具都能用. 按语言版本选好后, 复制进项目根目录, 文件名按所用工具的约定命名(比如 Codex 用 `AGENTS.md`, Claude Code 用 `CLAUDE.md`).规则要点：首次响应先触发 `caveman -- ultra`、回答用 `{语言}`(套用时替换成目标语言)、允许 subagent 工具调用。钩子（`hooks/block-git-write.sh`，经 `hooks.json` 接入）会拦截所有修改 Git 历史或远端的命令，提交/推送仍由人工掌控。
 
 ### 2. 技能库
 
