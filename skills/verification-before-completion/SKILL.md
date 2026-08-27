@@ -35,6 +35,8 @@ BEFORE claiming any status or expressing satisfaction:
 Skip any step = lying, not verifying
 ```
 
+`RUN: Execute the FULL command` 是指把已经选定的、与本次改动相关的验证命令完整执行完毕, 不是授权运行完整测试文件、完整 package 或整个 workspace 测试. 测试范围遵循最小相关验证原则; 扩大到完整测试文件或整套测试前, 必须先说明原因并取得用户明确确认.
+
 ## Common Failures
 
 | Claim | Requires | Not Sufficient |

@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when implementing any feature or bugfix, before writing implementation code
+description: 用于涉及业务逻辑, 数据处理, 状态变化或安全边界的功能开发和 Bug 修复, 按失败测试, 最小实现, 测试通过的流程工作. 不用于文档, 文案, 简单配置, 格式化, 临时原型, 简单转发或无实质行为变化的修改.
 ---
 
 # Test-Driven Development (TDD)

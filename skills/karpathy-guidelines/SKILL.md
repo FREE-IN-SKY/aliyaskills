@@ -1,166 +1,180 @@
 ---
 name: karpathy-guidelines
-description: 分析需求、制定方案、编写或审查代码、重构及修复缺陷时使用的通用工程准则，强调看清结构、守住原则、说透假设与取舍、优先采用最小现有方案、实施外科式改动、修复根因、堵住同类边界问题、编写具体易懂的注释、合并重复逻辑，并留下最小可运行自检。凡任务将生成或修改代码，必须在动手前先触发此技能。
+description: 分析需求、设计方案、编写或审查代码、重构及修复缺陷时使用的工程准则. 强调明确范围、理解执行路径、采用最小现有方案、实施外科式修改、修复根因并完成最小有效验证. 凡任务将生成或修改代码, 必须在动手前触发此技能.
 license: MIT
 ---
 
-# Karpathy Guidelines
+# Karpathy 工程准则
 
-Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
+目标: 减少范围扩张、过度设计、错误抽象、无关重构、症状修复和无验证交付.
 
-These guidelines reduce common LLM coding mistakes by favoring simple, surgical, verifiable changes.
+## 执行规则
 
-## 1. Understand Before Coding
+按顺序通过当前任务适用的门禁:
 
-Before writing code:
+1. 需求与范围.
+2. 对象与职责.
+3. 最小方案.
+4. 实施.
+5. 验证与边界.
+6. 最小自检.
 
-* State assumptions explicitly.
-* If the task has multiple valid interpretations, name the interpretations instead of silently choosing one.
-* If a simpler approach likely solves the real need, say so.
-* If the requirement is unclear enough to affect correctness, stop and ask.
+不适用的门禁直接跳过, 不得为通过门禁制造额外工作.
 
-For complex requests, first ask: "Do we really need X, or is Y enough?"
+适用门禁未通过时, 不得进入下一阶段或宣称完成.
 
-## Scope and Evidence Gate
+## 1. 需求与范围门禁
 
-The user's requested observable behavior defines the scope.
+编码前:
 
-Only complexity required by the current request, a verified reachable execution path, a reproduced failure, or an explicit data contract is allowed.
+- 明确影响正确性或范围的假设.
+- 存在多种有效理解时, 说明差异, 不得默默选择.
+- 更简单方案可能满足真实需求时, 明确指出.
+- 歧义影响正确性时, 停止并询问用户.
+- 两个方案都满足表面需求, 但会实质影响范围、行为或风险时, 先确认真的需要 X, 还是 Y 已足够.
 
-Existing project patterns may guide implementation of an already-justified change, but cannot independently justify new complexity.
+用户要求的可观察行为决定范围.
 
-Do not design abstractions, configuration, compatibility, fallbacks, extension points, or generalized solutions for hypothetical future requirements.
+只有以下证据允许增加复杂度:
 
-If correctness requires expanding the requested scope, state the concrete evidence before doing so.
+1. 用户当前明确要求.
+2. 已确认可达的执行路径.
+3. 已复现的故障.
+4. 明确的数据契约.
 
-## 2. Think Like a Senior Engineer
+项目模式只能指导已有依据的修改, 不能单独证明新增复杂度合理.
 
-Before designing a solution, identify the objects involved and how the objects relate.
+不得为假想需求增加抽象、配置、兼容层、fallback、扩展点或通用方案.
 
-If more than two objects have call or dependency relationships, choose a design pattern only when the design pattern solves a concrete problem. Explain what the pattern prevents. If the explanation is weak, do not use the pattern.
+正确实现必须扩大范围时, 先说明具体证据.
 
-Before implementation, give each module one responsibility sentence:
+## 2. 对象与职责门禁
 
-> This module only does X.
+设计前, 识别对象及其调用、依赖和所有权关系.
 
-Treat "and" in a responsibility sentence as a signal to inspect, not an automatic reason to split.
+### 2.1 现有行为保护门禁
 
-Split only when the responsibilities have independent callers, change for different reasons, or already cause duplicated logic or mixed ownership.
+提出方案或修改现有变量、字段、函数、数据结构、持久化数据或执行路径前, 必须:
 
-Do not split when doing so only adds files, interfaces, forwarding code, or coordination between pieces that still change together.
+1. 查明对象当前职责和数据语义.
+2. 搜索仓库内的定义、读取、写入、调用、序列化、迁移和测试引用. 7 类均须记录结果; 不适用时标记 `N/A` 并说明原因.
+3. 列出其支持的现有可观察行为. 未找到时写明搜索依据, 不得假定其无用途.
+4. 判断新需求与现有职责是否语义相同. 语义相同才允许复用; 语义不同默认新增独立状态或独立路径.
+5. 若方案会删除、裁剪、覆盖、重命名、改变语义或减少历史数据, 先列出将失去的行为、受影响调用方和测试、兼容或迁移方案, 以及不破坏旧行为的新增方案.
+6. 未完成以上检查, 不得提出或实施破坏性复用方案. 无法证明安全时停止, 明确不确定性并请求用户决定.
+7. 会改变现有可观察行为或造成数据丢失时, 修改前取得用户明确确认.
 
-Explain rejected alternatives only when multiple reasonable choices exist and the choice materially affects behavior, scope, risk, or maintainability.
+验收标准:
 
-Do not enumerate hypothetical alternatives for routine or obvious decisions.
+- 未说明的现有行为回归数 = 0.
+- 未经用户确认的数据丢失路径数 = 0.
+- 未经证据证明的旧对象语义变更数 = 0.
+- 定义、读取、写入、调用、序列化、迁移和测试引用的未记录项数 = 0.
+- 每个修改过的旧对象都记录原职责、新职责、复用依据或新增理由.
+- 每项可能受影响的现有行为都对应一个通过的自动化测试或明确的人工验证结果, 验证覆盖率 = 100%.
 
-## 3. Use the Smallest Existing Solution
+超过 2 个对象存在关系时, 只有设计模式能防止具体问题才使用它, 并说明该问题. 无法说明则不用.
 
-After understanding the task, walk this ladder and stop at the first level that works:
+涉及多个模块时, 为每个模块写一句职责:
 
-1. Does this feature need to exist? If not, do not build it.
-2. Does the codebase already have this helper, utility, or pattern? Reuse it.
-3. Does the standard library solve this? Use the standard library.
-4. Does the platform provide a native capability? Use the native capability.
-5. Does an existing installed dependency solve this? Use the existing dependency.
-6. Can this be one line? Write one line.
-7. Otherwise, write the smallest working implementation.
+> 这个模块只负责 X.
 
-Do not add features, abstractions, configurability, boilerplate, dependencies, or error handling for impossible scenarios.
+职责出现“和”时检查是否混合, 但仅在以下至少一种情况成立时拆分:
 
-Deletion is better than addition when deletion solves the problem. Boring code is better than clever code. Fewer files are better unless responsibilities would be mixed. When two standard-library options are similar in size, prefer the one that handles edge cases more correctly.
+- 存在独立调用方.
+- 因不同原因变化.
+- 已产生重复逻辑.
+- 已产生所有权混乱.
 
-## 4. Make Surgical Changes
+如果拆分只增加文件、interface、转发或协调成本, 且相关部分仍一起变化, 则不得拆分.
 
-When editing existing code:
+只有多个合理方案会实质影响行为、范围、风险或可维护性时, 才说明取舍. 常规决定不罗列假想方案.
 
-* Touch only lines required by the request.
-* Match the existing style, even if another style looks better.
-* Do not refactor adjacent code unless the request requires it.
-* Do not clean up unrelated dead code; mention unrelated dead code separately.
-* Remove only imports, variables, functions, or files made unused by your own change.
+## 3. 最小方案门禁
 
-Every changed line must trace directly to the user request.
+按顺序检查, 停在第一个可行方案:
 
-The shortest working change wins only when the real execution flow is understood. A small change in the wrong place is still a bug.
+1. 功能是否需要存在? 不需要则不实现.
+2. 项目是否已有相同 helper、utility 或模式? 有则复用.
+3. 标准库或平台原生能力能否解决? 能则使用.
+4. 已安装依赖能否解决? 能则使用.
+5. 能否用一行清晰代码解决? 可读性和边界行为不下降时才使用.
+6. 否则编写最小可用实现.
 
-## 5. Fix Root Causes, Not Symptoms
+不得增加需求未要求的功能、抽象、配置、样板、依赖或不可能场景的错误处理.
 
-For bug reports:
+删除能解决时优先删除. 普通代码优于聪明代码. 职责不混合时, 更少文件优于更多文件.
 
-1. Treat the report as a symptom.
-2. Find the function that owns the broken behavior.
-3. Inspect enough callers to confirm the ownership and affected execution path.
-4. Fix a shared entry point only when evidence shows that the same root cause affects multiple currently reachable paths.
+## 4. 实施门禁
 
-Do not modify sibling paths merely because they look similar. Do not broaden the fix to hypothetical callers or unobserved failures.
+修改现有代码时:
 
-## 6. Define Verifiable Success
+- 只修改用户要求所必需的代码.
+- 遵循项目现有风格.
+- 不重构无关相邻代码.
+- 不清理无关死代码, 发现后单独说明.
+- 只删除因本次修改而无用的内容.
+- 每处修改必须能追溯到用户要求.
 
-Turn work into checks:
+最短修改必须建立在已理解真实执行路径上.
 
-* "Fix the bug" → write or identify a failing check, then make the check pass.
-* "Add validation" → check invalid inputs, then make the check pass.
-* "Refactor" → verify behavior before and after.
+修复 Bug 时:
 
-For multi-step work, use:
+1. 把报告视为症状.
+2. 找到负责错误行为的函数.
+3. 检查足够调用方, 确认所有权和受影响路径.
+4. 只有相同根因影响多个当前可达路径时, 才修改共享入口.
 
-1. Step → verify: check
-2. Step → verify: check
-3. Step → verify: check
+不得因其他路径看起来相似而一起修改, 也不得扩大到假想调用方.
 
-Loop until the success criteria pass.
+注释先说明函数具体做什么. 原因不明显时再说明为什么存在. 避免没有具体宾语的 `handle`、`manage`、`process` 和 `wrap`.
 
-Keep local verification focused on the files and packages changed. Run the smallest relevant test set; do not run the full workspace test suite as a routine completion step.
+有意简化时使用:
 
-## 7. Check Edge Cases Before Finalizing
+> dogtail: 当前限制. 未来替换方式.
 
-Before calling a plan complete, check edge cases that are reachable under the current contract, explicitly requested, observed in real data, or located at a trust boundary:
+编码后, 只比较本次新增或修改范围内的相似函数. 职责相同则合并, 不得借此重构无关代码.
 
-* Empty input: what happens?
-* Out-of-range input: what happens?
-* Shared mutable data: can multiple readers or writers overwrite each other?
+## 5. 验证与边界门禁
 
-For each case, state one sentence: either the case is already handled and where, or the case will fail and how the plan fixes the failure.
+把任务转换成可检查结果:
 
-Do not add validation, fallbacks, retries, or recovery branches for states that the established contract makes impossible.
+- 修复 Bug: 先复现或找到失败检查, 再使其通过.
+- 增加校验: 检查非法输入.
+- 重构: 验证修改前后行为一致.
 
-If the contract is unclear, verify it before adding defensive code.
+多步骤任务使用“步骤 → 验证”结构, 持续检查直到成功标准通过.
 
-Do not skip input validation at trust boundaries, data-loss prevention, security, accessibility, hardware calibration, or explicitly requested requirements.
+验证集中在本次修改涉及的文件和 package. 运行最小相关测试集, 不把整个 workspace 测试作为日常完成步骤.
 
-## 8. Keep Comments Concrete
+默认只运行本次改动直接涉及的测试和必要的关联回归测试. 不得仅因测试文件或测试套件已经存在, 就擅自运行完整测试文件、完整 package 测试或整个 workspace 测试. 如确实需要扩大到完整测试文件或整套测试, 必须先向用户说明具体原因和预计范围, 并取得明确确认.
 
-Every function comment starts with what the function does.
+只检查以下来源的边界情况:
 
-If the reason for the function is not obvious, add one sentence explaining why the function exists.
+- 当前契约下真实可达.
+- 用户明确要求.
+- 已在真实数据中观察到.
+- 位于信任边界.
 
-Avoid vague words such as "handle", "manage", "process", and "wrap" unless the sentence says exactly what is being done.
+适用时检查空输入、越界输入和共享可变数据覆盖. 每项用一句话说明已有处理位置, 或失败方式及修复方式.
 
-If a simplification is intentional, mark it with:
+不得为契约明确不可能的状态增加校验、fallback、重试或恢复分支. 契约不明确时先确认.
 
-> dogtail: ...
+不得跳过信任边界校验、数据丢失预防、安全、无障碍、硬件校准或用户明确要求.
 
-The `dogtail:` note must state the simplification limit and how to replace the simplified version later.
+## 6. 最小自检门禁
 
-## 9. Merge Duplicate Logic
+非平凡行为发生变化时, 优先使用项目现有验证机制.
 
-After coding, compare functions that appear similar.
+只有同时满足以下条件才新增自检:
 
-If two functions have names and comments that describe the same action, merge the functions.
+- 能实质保护用户要求的行为.
+- 不引入新测试框架或 fixture 层.
+- 不增加 helper 抽象或生产代码 hook.
+- 逻辑损坏时必然失败.
 
-Do not keep two functions that perform the same responsibility.
+保持最小, 简单 assertion 或单文件自检足够时不得扩大.
 
-## 10. Leave a Minimal Self-Check
+不得测试实现细节、文案、简单转发或一行简单实现.
 
-For changed non-trivial behavior, use the project's existing verification mechanism when it can catch the regression.
-
-Add a new self-check only when it materially protects the requested behavior and requires no new framework, fixture layer, helper abstraction, or production hook.
-
-When a new self-check is justified, keep it minimal:
-
-* no test framework required,
-* no fixtures required,
-* a simple assertion or single-file self-check is enough,
-* the self-check must fail when the logic breaks.
-
-Do not add tests that only verify implementation details, wording, trivial delegation, or one-line simple implementations.
+所有相关成功标准通过后, 才能宣称任务完成.

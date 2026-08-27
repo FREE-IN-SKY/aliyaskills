@@ -1,6 +1,6 @@
 ---
 name: writing-plans-custom
-description: 当用户提供书面规格或验收标准，并要求在编码前为涉及多个文件的实现编写实施计划时使用。不用于小型修复、探索性讨论、代码审查、故障排查或缺少明确需求的任务。
+description: 当用户提供书面规格或验收标准，并要求在编码前为涉及多个文件的实现编写实施计划时使用. 根据执行边界生成 Task → Step、Phase → Task → Step，或建议拆成多份独立计划. 不用于小型修复、探索性讨论、代码审查、故障排查或缺少明确需求的任务. 
 ---
 
 # Writing Plans
@@ -20,7 +20,29 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Scope Check
 
-If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
+Choose the plan hierarchy from execution boundaries, not file count, task count,
+estimated duration, or technical layers such as frontend/backend/database. Apply
+these checks in order:
+
+1. **Separate plans for independently deliverable subsystems.** If one part can
+   be implemented, tested, and delivered while another part is omitted, treat
+   them as separate sub-projects. Suggest one spec and one plan per subsystem.
+   Each plan must produce working, testable software on its own. Components
+   that only work together to deliver one feature remain in one plan.
+2. **Use phases for ordered acceptance gates.** Use `Phase → Task → Step` only
+   when the plan contains at least two ordered milestones and later work cannot
+   safely begin until the earlier milestone is completed and verified. Each
+   phase must contain multiple reviewer-worthy tasks and end with a concrete,
+   testable outcome. Valid boundaries include a verified data migration before
+   switching business logic, a stable API contract before client integration,
+   or a validated compatibility rollout before removing legacy behavior.
+3. **Otherwise use tasks directly.** Use `Task → Step` when all tasks serve one
+   deliverable, can run as one continuous implementation sequence, and require
+   no phase-level approval or verification gate.
+
+Do not create phases merely to group files, technical layers, or a long task
+list. File count, task count, duration, and likely session count are supporting
+signals only. A phase boundary must change what work is safe or possible next.
 
 ## File Structure
 
@@ -77,6 +99,23 @@ include this section.]
 ```
 
 ## Task Structure
+
+For a plan without phases, place tasks directly after the plan header. For a
+phased plan, group tasks under this structure:
+
+```markdown
+## Phase N: [Verified Milestone]
+
+**Outcome:** [Working, testable result produced by this phase]
+
+**Completion gate:** [Exact command, observable behavior, or approval required
+before the next phase may begin]
+
+### Task N: [Component Name]
+```
+
+Number tasks continuously across phases. The task body remains identical in
+both plan shapes.
 
 ````markdown
 ### Task N: [Component Name]
